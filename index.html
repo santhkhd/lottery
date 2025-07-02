@@ -176,89 +176,70 @@
 <body>
   <div class="header">Kerala Lottery Results</div>
   <div class="welcome">welcome</div>
-  <div class="lottery-grid">
-    <a class="lottery-card" href="#">
-      <div class="card-top">
-        <span class="new-ribbon" data-date="2025-06-30">NEW</span>
-        <span class="badge">BT-9</span>
-        <div class="lottery-title">BHAGYATHARA</div>
-      </div>
-      <div class="card-bottom">30/06/2025</div>
-    </a>
-    <a class="lottery-card" href="page/SM-9-2025-06-29.html">
-      <div class="card-top">
-        <span class="badge">SM-9</span>
-        <div class="lottery-title">SAMRUDHI</div>
-      </div>
-      <div class="card-bottom">29/06/2025</div>
-    </a>
-    <a class="lottery-card" href="#">
-      <div class="card-top">
-        <span class="badge">KR-712</span>
-        <div class="lottery-title">KARUNYA</div>
-      </div>
-      <div class="card-bottom">28/06/2025</div>
-    </a>
-    <a class="lottery-card" href="#">
-      <div class="card-top">
-        <span class="badge">SK-9</span>
-        <div class="lottery-title">SUVARNA KERALAM</div>
-      </div>
-      <div class="card-bottom">27/06/2025</div>
-    </a>
-    <a class="lottery-card" href="#">
-      <div class="card-top">
-        <span class="badge">KN-578</span>
-        <div class="lottery-title">KARUNYA PLUS</div>
-      </div>
-      <div class="card-bottom">26/06/2025</div>
-    </a>
-    <a class="lottery-card" href="#">
-      <div class="card-top">
-        <span class="badge">DL-7</span>
-        <div class="lottery-title">DHANALEKSHMI</div>
-      </div>
-      <div class="card-bottom">25/06/2025</div>
-    </a>
-    <a class="lottery-card" href="#">
-      <div class="card-top">
-        <span class="badge">SS-473</span>
-        <div class="lottery-title">STHREE SAKTHI</div>
-      </div>
-      <div class="card-bottom">24/06/2025</div>
-    </a>
-    <a class="lottery-card" href="#">
-      <div class="card-top">
-        <span class="badge">BT-8</span>
-        <div class="lottery-title">BHAGYATHARA</div>
-      </div>
-      <div class="card-bottom">23/06/2025</div>
-    </a>
-    <a class="lottery-card" href="#">
-      <div class="card-top">
-        <span class="badge">SM-8</span>
-        <div class="lottery-title">SAMRUDHI</div>
-      </div>
-      <div class="card-bottom">22/06/2025</div>
-    </a>
-    <a class="lottery-card" href="#">
-      <div class="card-top">
-        <span class="badge">KR-711</span>
-        <div class="lottery-title">KARUNYA</div>
-      </div>
-      <div class="card-bottom">21/06/2025</div>
-    </a>
+  <div class="lottery-grid" id="lottery-grid">
+    <!-- Lottery cards will be generated here by JavaScript -->
   </div>
   <script>
-    // Show NEW only for cards with today's date
-    var today = new Date();
-    var yyyy = today.getFullYear();
-    var mm = String(today.getMonth() + 1).padStart(2, '0');
-    var dd = String(today.getDate()).padStart(2, '0');
-    var todayStr = yyyy + '-' + mm + '-' + dd;
-    document.querySelectorAll('.new-ribbon[data-date]').forEach(function(el) {
-      if (el.getAttribute('data-date') !== todayStr) {
-        el.style.display = 'none';
+    document.addEventListener('DOMContentLoaded', function() {
+      const grid = document.getElementById('lottery-grid');
+      if (!grid) return;
+
+      const schedule = [
+        { dayOfWeek: 0, name: 'SAMRUDHI', shortName: 'SM', baseNumber: 9, baseDate: '2025-06-29' },
+        { dayOfWeek: 1, name: 'BHAGYATHARA', shortName: 'BT', baseNumber: 8, baseDate: '2025-06-23' },
+        { dayOfWeek: 2, name: 'STHREE-SAKTHI', shortName: 'SS', baseNumber: 473, baseDate: '2025-06-24' },
+        { dayOfWeek: 3, name: 'DHANALEKSHMI', shortName: 'DL', baseNumber: 7, baseDate: '2025-06-25' },
+        { dayOfWeek: 4, name: 'KARUNYA PLUS', shortName: 'KN', baseNumber: 578, baseDate: '2025-06-26' },
+        { dayOfWeek: 5, name: 'SUVARNA KERALAM', shortName: 'SK', baseNumber: 9, baseDate: '2025-06-27' },
+        { dayOfWeek: 6, name: 'KARUNYA', shortName: 'KR', baseNumber: 712, baseDate: '2025-06-28' }
+      ];
+
+      // Determine the reference date based on Indian Standard Time (IST)
+      const istTime = new Date(new Date().getTime() + (330 * 60 * 1000));
+      const istHour = istTime.getUTCHours();
+
+      const today = new Date();
+      // If it's before 12 PM IST, the latest result shown is for the previous day
+      if (istHour < 12) {
+        today.setDate(today.getDate() - 1);
+      }
+      
+      const todayStr = today.toISOString().split('T')[0];
+
+      for (let i = 0; i < 14; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+
+        const dayOfWeek = date.getDay();
+        const lottery = schedule.find(l => l.dayOfWeek === dayOfWeek);
+
+        if (lottery) {
+          const baseDate = new Date(lottery.baseDate);
+          const daysDifference = (date - baseDate) / (1000 * 60 * 60 * 24);
+          const weeksPassed = Math.floor(daysDifference / 7);
+          const currentNumber = lottery.baseNumber + weeksPassed;
+
+          const yyyy = date.getFullYear();
+          const mm = String(date.getMonth() + 1).padStart(2, '0');
+          const dd = String(date.getDate()).padStart(2, '0');
+          const cardDateStr = `${dd}/${mm}/${yyyy}`;
+          const dataDateStr = `${yyyy}-${mm}-${dd}`;
+
+          const isNew = (dataDateStr === todayStr);
+          const link = `page/${lottery.shortName}-${currentNumber}-${dataDateStr}.html`;
+
+          const cardHtml = `
+            <a class="lottery-card" href="${link}">
+                <div class="card-top">
+                    ${isNew ? `<span class="new-ribbon">NEW</span>` : ''}
+                    <span class="badge">${lottery.shortName}-${currentNumber}</span>
+                    <div class="lottery-title">${lottery.name}</div>
+                </div>
+                <div class="card-bottom">${cardDateStr}</div>
+            </a>
+          `;
+          grid.innerHTML += cardHtml;
+        }
       }
     });
   </script>
