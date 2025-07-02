@@ -194,15 +194,13 @@
         { dayOfWeek: 6, name: 'KARUNYA', shortName: 'KR', baseNumber: 712, baseDate: '2025-06-28' }
       ];
 
-      // Determine the reference date based on Indian Standard Time (IST)
-      const istTime = new Date(new Date().getTime() + (330 * 60 * 1000));
-      const istHour = istTime.getUTCHours();
-
-      const today = new Date();
-      // If it's before 12 PM IST, the latest result shown is for the previous day
-      if (istHour < 12) {
-        today.setDate(today.getDate() - 1);
-      }
+      // Determine the current date in Indian Standard Time (IST)
+      const now = new Date();
+      // Get the current time in IST by adding the offset (5.5 hours)
+      const istTime = new Date(now.getTime() + (330 * 60 * 1000));
+      // Create a 'today' object representing the start of the day in IST.
+      // We use UTC methods on the IST time to get the correct date components.
+      const today = new Date(Date.UTC(istTime.getUTCFullYear(), istTime.getUTCMonth(), istTime.getUTCDate()));
       
       const todayStr = today.toISOString().split('T')[0];
 
