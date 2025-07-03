@@ -1,0 +1,23 @@
+name: Update Lottery HTML
+
+on:
+  repository_dispatch:
+    types: [update_lottery_html]
+
+jobs:
+  update-html:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Write HTML file
+        run: |
+          echo "${{ github.event.client_payload.html_content }}" > "${{ github.event.client_payload.filename }}"
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "${{ github.event.client_payload.filename }}"
+          git commit -m "Update lottery HTML: ${{ github.event.client_payload.filename }}"
+          git push 
